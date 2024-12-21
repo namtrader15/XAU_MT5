@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nam_Trader_DashBoard</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 1.1em;
+            border-bottom: 1px solid #eee;
+        }
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        .control-buttons { 
+            margin-top: 20px; 
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .btn {
+            width: 100%;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>NamTrader MT5 XAUUSD</h1>
+        <div class="status-item"><strong>Số dư tài khoản:</strong> <span id="balance">{{ trade_status.balance }} USD</span></div>
+        <div class="status-item"><strong>Entry Price:</strong> <span id="entry-price">{{ trade_status.entry_price }}</span></div>
+        <div class="status-item"><strong>Mark Price:</strong> <span id="mark-price">{{ trade_status.mark_price }}</span></div>
+        <div class="status-item"><strong>Trạng thái vị thế:</strong> <span id="status">{{ trade_status.status }}</span></div>
+        <div class="status-item"><strong>Lợi nhuận:</strong> <span id="profit">{{ trade_status.profit }} USD</span></div>
+
+        <!-- Các nút điều khiển -->
+        <div class="control-buttons">
+            <!-- Nút điều khiển bot -->
+            <button id="start-btn" class="btn btn-success" onclick="controlBot('start')">Start Bot</button>
+            <button id="pause-btn" class="btn btn-danger" onclick="controlBot('pause')">Pause Bot</button>
+
+            <!-- Nút giao dịch -->
+            <button id="buy-market-btn" class="btn btn-primary" onclick="confirmAction('buy_market')">Buy Market</button>
+            <button id="sell-market-btn" class="btn btn-secondary" onclick="confirmAction('sell_market')">Sell Market</button>
+            <button id="close-market-btn" class="btn btn-warning" onclick="confirmAction('close_market')">Close Market</button>
+        </div>
+    </div>
+
+    <script>
+        // Hộp thoại xác nhận trước khi thực hiện giao dịch
+        function confirmAction(action) {
+            let actionText = '';
+            if (action === 'buy_market') actionText = 'Buy Market';
+            if (action === 'sell_market') actionText = 'Sell Market';
+            if (action === 'close_market') actionText = 'Close Market';
+
+            if (confirm(`Bạn có chắc chắn muốn thực hiện lệnh ${actionText}?`)) {
+                executeTrade(action);
+            }
+        }
+
+        // Gửi yêu cầu giao dịch tới Flask backend
+        function executeTrade(action) {
+            fetch(`/${action}`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => alert(data.message))
+                .catch(error => console.error(`Lỗi khi thực hiện ${action}:`, error));
+        }
+
+        // Điều khiển trạng thái bot qua API
+        function controlBot(action) {
+            fetch(`/${action}_bot`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => alert(data.message))
+                .catch(error => console.error(`Lỗi khi điều khiển bot:`, error));
+        }
+    </script>
+</body>
+</html>
