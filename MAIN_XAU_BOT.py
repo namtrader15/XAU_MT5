@@ -251,6 +251,7 @@ def pause_bot_route():
 if __name__ == '__main__':
     if connect_mt5():
         print("Khởi động bot giao dịch trên server Flask.")
+        start_bot()
         app.run(debug=True, use_reloader=False)
     else:
         print("Không thể kết nối đến MT5.")
